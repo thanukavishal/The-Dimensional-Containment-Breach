@@ -1,0 +1,55 @@
+# Visual Studio cache and user-specific files
+.vs/
+*.user
+*.userosv
+*.suo
+*.userprefs
+*.sln.docstates
+*.db
+*.opendb
+*.VC.db
+*.VC.opendb
+
+# Build output directories (Debug, Release, x64, x86)
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]in/
+[Oo]bj/
+App/Debug/
+App/App/Debug/
+App/Lib/Debug/
+
+# Intermediate compiler and linker artifacts
+*.obj
+*.ilk
+*.pdb
+*.idb
+*.pch
+*.res
+*.tlog
+*.lastbuildstate
+*.log
+*.recipe
+*.FileListAbsolute.txt
+*.exp
+*.lib
+*.exe
+
+# Precompiled headers and cache
+*.ipch
+*.sdf
+$tf/
+
+# Ignore system DLLs accidentally copied from old Windows versions
+App/App/opengl32.dll
+App/App/glu32.dll
+App/Lib/opengl32.dll
+App/Lib/glu32.dll
+App/Lib/glut32.dll
+
+# Operating system files
+Thumbs.db
+Desktop.ini
+.DS_Store
