@@ -1,9 +1,7 @@
 #pragma once
-// ==============================================================================================
-// File: Relic.h
-// Description: Defines the Relic class representing the central floating, multi-ring artifact.
-// ==============================================================================================
-
+#include <windows.h>
+#include <stdlib.h>
+#include <glut.h>
 #include "Mesh.h"
 #include "MeshRenderer.h"
 
@@ -20,7 +18,7 @@ public:
     void update(float speedMult = 1.0f);
 
     // Draws the levitating relic, its materials, rings, and glowing energy core using OpenGL.
-    void draw(MeshRenderer& renderer, bool isWireframe);
+    void draw(MeshRenderer& renderer, bool isWireframe, GLuint stoneTex = 0);
 
     // Returns the current floating timer value (also used by Main.cpp to sync torch flickering).
     float getFloatTimer() const { return floatTimer; }
@@ -38,16 +36,28 @@ private:
     // Configures OpenGL material parameters for antique reflective bronze alloy.
     void setBronzeRelicMaterial();
 
-    // Configures OpenGL material parameters for a cyan glowing emissive energy sphere.
+    // Configures material for an ethereal glowing blue-cyan power core.
     void setCoreEnergyMaterial();
 
     // Resets material emission back to black so other objects do not glow unintentionally.
     void resetEmission();
 
+    // Helper function to render center relic stone idol.
+    void drawStoneIdolHead(MeshRenderer& renderer, bool isWireframe, GLuint stoneTex);
+
     // 3D procedural meshes for the concentric rings
     Mesh outerTorusMesh; // Largest outer rotating ring
     Mesh midTorusMesh;   // Middle rotating ring
     Mesh innerTorusMesh; // Smallest inner rotating ring
+
+    // 3D procedural meshes for the central stone idol head
+    Mesh idolHeadMesh;
+    Mesh idolCrownMesh;
+    Mesh idolBrowMesh;
+    Mesh idolNoseMesh;
+    Mesh idolEyeSocketMesh;
+    Mesh idolMouthFrameMesh;
+    Mesh idolToothMesh;
 
     // Rotation angles (in degrees, 0 to 360) for each ring
     float rotRing1;      // Outer ring angle (rotates about the X axis)

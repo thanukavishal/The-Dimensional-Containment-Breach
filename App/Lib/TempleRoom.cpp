@@ -17,11 +17,11 @@ TempleRoom::TempleRoom()
 // Purpose: Procedurally builds all meshes for the room and initializes collision bounds.
 // ==============================================================================================
 void TempleRoom::init() {
-    // 1. Room Floor & Ceiling Slabs (26m x 26m, 0.4m thick, repeating texture 8 times)
+    // Room Floor & Ceiling Slabs (26m x 26m, 0.4m thick, repeating texture 8 times)
     floorMesh = Mesh::createTexturedBox(ROOM_SIZE, 0.4f, ROOM_SIZE, 8.0f, 8.0f);
     ceilingMesh = Mesh::createTexturedBox(ROOM_SIZE, 0.4f, ROOM_SIZE, 8.0f, 8.0f);
 
-    // 2. Seamless Continuous Walls & Overhead Lintel
+    // Seamless Continuous Walls & Overhead Lintel
     const float tileUTotal = 3.5f; // Total horizontal texture repeats across the whole 26m wall
     const float tileVTotal = 2.5f; // Total vertical texture repeats across the 8m height
     // Calculate horizontal texture boundaries corresponding to the door opening
@@ -44,19 +44,19 @@ void TempleRoom::init() {
     // Carved Stone Arch Molding framing the curved opening
     archMoldingMesh = Mesh::createArch(1.92f, 2.18f, 0.45f, 24);
 
-    // Heavy Stone/Iron Portcullis Trapdoor Slab
+    // Heavy Stone Trapdoor Slab
     portcullisMesh = Mesh::createTexturedBox(DOOR_WIDTH - 0.1f, DOOR_HEIGHT, 0.2f, 1.0f, 2.0f);
 
-    // 3. Heavy Stone Architrave Beams & Broken Diagonal Crossbeam
+    // Heavy Stone Architrave Beams & Broken Diagonal Crossbeam
     crossbeamMesh = Mesh::createTexturedBox(0.75f, 0.65f, ROOM_SIZE, 1.0f, 8.0f);
     brokenCrossbeamMesh = Mesh::createTexturedBox(0.70f, 0.60f, 9.6f, 1.0f, 3.0f);
 
-    // 4. Stepped Ceremonial Dais & Central Altar Platform
+    // Stepped Ceremonial Dais & Central Altar Platform
     daisBottomMesh = Mesh::createTexturedBox(6.0f, 0.35f, 6.0f, 2.0f, 2.0f);      // Bottom stepped tier (6m x 6m)
     daisTopMesh = Mesh::createTexturedBox(4.6f, 0.35f, 4.6f, 1.5f, 1.5f);         // Middle stepped tier (4.6m x 4.6m)
     altarPedestalMesh = Mesh::createTexturedBox(1.8f, 0.70f, 1.8f, 1.0f, 1.0f);   // Central altar block (1.8m x 1.8m)
 
-    // 5. Classical Column Components
+    // Classical Column Components
     columnBaseMesh = Mesh::createTexturedBox(1.4f, 0.4f, 1.4f, 1.0f, 1.0f); // Square base and capital plinths
     columnShaftMesh = Mesh::createCylinder(0.52f, COLUMN_HEIGHT, 24);         // Fluted cylindrical pillar shaft
 
@@ -80,11 +80,11 @@ void TempleRoom::buildCollisionMap() {
     obstacles.clear();
     const float DRONE_RADIUS = 0.55f;
 
-    // 1. Central Altar Dais (approx. 6m x 6m + drone radius buffer)
+    // Central Altar Dais (approx. 6m x 6m + drone radius buffer)
     float daisHalf = 3.0f + DRONE_RADIUS;
     obstacles.push_back({ -daisHalf, daisHalf, -daisHalf, daisHalf });
 
-    // 2. The 4 Corner Columns (centered at +/-COL_DIST, +/-COL_DIST)
+    // The 4 Corner Columns (centered at +/-COL_DIST, +/-COL_DIST)
     float colBuffer = 0.7f + DRONE_RADIUS;
     float coords[4][2] = {
         { -COL_DIST, -COL_DIST }, // Northwest column
@@ -98,7 +98,7 @@ void TempleRoom::buildCollisionMap() {
         obstacles.push_back({ cx - colBuffer, cx + colBuffer, cz - colBuffer, cz + colBuffer });
     }
 
-    // 3. Broken fallen diagonal crossbeam footprint on the floor
+    // Broken fallen diagonal crossbeam footprint on the floor
     obstacles.push_back({ -7.0f, -2.8f, -0.6f, 6.1f });
 }
 
@@ -113,12 +113,6 @@ void TempleRoom::addObstacles(const std::vector<BoxCollider>& newObstacles) {
 // ==============================================================================================
 // Method: TempleRoom::isPositionValid
 // Purpose: Evaluates whether a proposed 2D position (targetX, targetZ) is walkable / flyable.
-// Parameters:
-//   targetX, targetZ: The candidate coordinates the camera wants to move into.
-//   droneRadius: Safety buffer around the drone.
-// Returns:
-//   true:  Position is clear, drone can move here.
-//   false: Blocked by an outer wall or obstacle collider.
 // ==============================================================================================
 bool TempleRoom::isPositionValid(float targetX, float targetZ, float droneRadius) const {
     // Room perimeter boundary: walls are at +/- ROOM_SIZE / 2 (+/- 13.0m).
@@ -154,11 +148,7 @@ void TempleRoom::renderMesh(MeshRenderer& renderer, const Mesh& mesh, bool isWir
 
 // ==============================================================================================
 // Method: TempleRoom::bindMaterialTexture
-// Purpose: Sets OpenGL lighting material colors and binds the specified 2D texture.
-// Parameters:
-//   texID: OpenGL texture handle ID (e.g. textures.wall).
-//   diffuseR, diffuseG, diffuseB: Base surface reflectance color tint.
-//   isWireframe: If true, disables texturing so wireframe lines stand out clearly.
+// Purpose: Sets OpenGL lighting material colors and binds the specified 2D texture
 // ==============================================================================================
 void TempleRoom::bindMaterialTexture(GLuint texID, float diffuseR, float diffuseG, float diffuseB, bool isWireframe) {
     // Only bind and enable 2D texturing when in solid mode and a valid texture ID exists
@@ -194,37 +184,37 @@ void TempleRoom::drawWallWithArchway(MeshRenderer& renderer, bool isWireframe) {
     // segOffset is the distance from center (0) to the center of each flanking wall segment
     float segOffset = (ROOM_SIZE / 2.0f) - (WALL_SEG_WIDTH / 2.0f); // 7.5m from center
 
-    // 1. Left Wall Segment (X = -13m to -2m)
+    // Left Wall Segment (X = -13m to -2m)
     glPushMatrix();
     glTranslatef(-segOffset, WALL_HEIGHT / 2.0f, 0.0f);
     renderMesh(renderer, wallLeftMesh, isWireframe);
     glPopMatrix();
 
-    // 2. Right Wall Segment (X = +2m to +13m)
+    // Right Wall Segment (X = +2m to +13m)
     glPushMatrix();
     glTranslatef(segOffset, WALL_HEIGHT / 2.0f, 0.0f);
     renderMesh(renderer, wallRightMesh, isWireframe);
     glPopMatrix();
 
-    // 3. Seamless Spandrels filling wall space above the arch curve (Y = 3m to 5m)
+    // Seamless Spandrels filling wall space above the arch curve (Y = 3m to 5m)
     glPushMatrix();
     glTranslatef(0.0f, 3.0f, 0.0f);
     renderMesh(renderer, archSpandrelsMesh, isWireframe);
     glPopMatrix();
 
-    // 4. Carved Stone Arch Molding framing the curved opening
+    // Carved Stone Arch Molding framing the curved opening
     glPushMatrix();
     glTranslatef(0.0f, 3.0f, 0.0f);
     renderMesh(renderer, archMoldingMesh, isWireframe);
     glPopMatrix();
 
-    // 5. Seamless Continuous Lintel bridging above the doorway up to ceiling (Y = 5m to 8m)
+    // Seamless Continuous Lintel bridging above the doorway up to ceiling (Y = 5m to 8m)
     glPushMatrix();
     glTranslatef(0.0f, DOOR_HEIGHT + (WALL_HEIGHT - DOOR_HEIGHT) / 2.0f, 0.0f);
     renderMesh(renderer, lintelMesh, isWireframe);
     glPopMatrix();
 
-    // 6. Concealed Suspended Stone Portcullis Slab (Parked high in ceiling recess)
+    // Concealed Suspended Stone Portcullis Slab (Parked high in ceiling recess)
     bindMaterialTexture(textures.door, 0.65f, 0.60f, 0.58f, isWireframe);
     glPushMatrix();
     glTranslatef(0.0f, portcullisY, 0.0f);
@@ -235,10 +225,6 @@ void TempleRoom::drawWallWithArchway(MeshRenderer& renderer, bool isWireframe) {
 // ==============================================================================================
 // Method: TempleRoom::drawSingleColumn
 // Purpose: Renders a classical column at world position (x, z).
-// Components:
-//   - Base: Square stone block resting on the floor (Y = 0.2m).
-//   - Shaft: Vertical cylinder (Y = 0.4m to 6.6m).
-//   - Capital: Decorative square stone cap atop the column supporting the ceiling beams.
 // ==============================================================================================
 void TempleRoom::drawSingleColumn(MeshRenderer& renderer, float x, float z, bool isWireframe) {
     glPushMatrix();
@@ -246,19 +232,19 @@ void TempleRoom::drawSingleColumn(MeshRenderer& renderer, float x, float z, bool
 
     bindMaterialTexture(textures.pillar, 0.82f, 0.80f, 0.78f, isWireframe);
 
-    // 1. Column Base Plinth
+    // Column Base Plinth
     glPushMatrix();
     glTranslatef(0.0f, 0.2f, 0.0f);
     renderMesh(renderer, columnBaseMesh, isWireframe);
     glPopMatrix();
 
-    // 2. Column Fluted Shaft
+    // Column Fluted Shaft
     glPushMatrix();
     glTranslatef(0.0f, 0.4f + COLUMN_HEIGHT / 2.0f, 0.0f);
     renderMesh(renderer, columnShaftMesh, isWireframe);
     glPopMatrix();
 
-    // 3. Column Capital (Top Cap)
+    // Column Capital (Top Cap)
     glPushMatrix();
     glTranslatef(0.0f, 0.4f + COLUMN_HEIGHT + 0.2f, 0.0f);
     renderMesh(renderer, columnBaseMesh, isWireframe);
@@ -272,14 +258,14 @@ void TempleRoom::drawSingleColumn(MeshRenderer& renderer, float x, float z, bool
 // Purpose: Renders the overhead ceiling slab, structural crossbeams, and fallen collapsed beam.
 // ==============================================================================================
 void TempleRoom::drawCeilingAndBeams(MeshRenderer& renderer, bool isWireframe) {
-    // 1. Textured Stone Ceiling Slab at Y = 8.0m
+    // Textured Stone Ceiling Slab at Y = 8.0m
     bindMaterialTexture(textures.floor, 0.68f, 0.65f, 0.60f, isWireframe);
     glPushMatrix();
     glTranslatef(0.0f, WALL_HEIGHT + 0.2f, 0.0f);
     renderMesh(renderer, ceilingMesh, isWireframe);
     glPopMatrix();
 
-    // 2. Heavy Stone Architrave Beams Connecting Columns and Outer Walls
+    // Heavy Stone Architrave Beams Connecting Columns and Outer Walls
     bindMaterialTexture(textures.wall, 0.74f, 0.71f, 0.66f, isWireframe);
     float beamY = WALL_HEIGHT - 0.55f; // Y ~ 7.45m directly underneath ceiling
 
@@ -307,7 +293,7 @@ void TempleRoom::drawCeilingAndBeams(MeshRenderer& renderer, bool isWireframe) {
     renderMesh(renderer, crossbeamMesh, isWireframe);
     glPopMatrix();
 
-    // 3. Collapsed / Broken Crossbeam Fallen Diagonally from Ceiling to Floor
+    // Collapsed / Broken Crossbeam Fallen Diagonally from Ceiling to Floor
     // Adds atmospheric ruin aesthetics: rotated on both X and Z axes to look naturally fallen.
     bindMaterialTexture(textures.wall, 0.65f, 0.62f, 0.58f, isWireframe);
     glPushMatrix();
@@ -324,17 +310,17 @@ void TempleRoom::drawCeilingAndBeams(MeshRenderer& renderer, bool isWireframe) {
 // Purpose: Master rendering function that draws the entire temple environment.
 // ==============================================================================================
 void TempleRoom::draw(MeshRenderer& renderer, bool isWireframe) {
-    // 1. Floor (centered at Y = -0.2m so top surface sits exactly at ground level Y = 0.0m)
+    // Floor (centered at Y = -0.2m so top surface sits exactly at ground level Y = 0.0m)
     bindMaterialTexture(textures.floor, 0.75f, 0.72f, 0.68f, isWireframe);
     glPushMatrix();
     glTranslatef(0.0f, -0.2f, 0.0f);
     renderMesh(renderer, floorMesh, isWireframe);
     glPopMatrix();
 
-    // 2. Ceiling & Heavy Overhead Crossbeams
+    // Ceiling & Heavy Overhead Crossbeams
     drawCeilingAndBeams(renderer, isWireframe);
 
-    // 3. Four Walls with Archways & Portcullises (Modular layout rotated around chamber)
+    // Four Walls with Archways & Portcullises (Modular layout rotated around chamber)
     // North Wall (-Z)
     glPushMatrix();
     glTranslatef(0.0f, 0.0f, -ROOM_SIZE / 2.0f);
@@ -362,7 +348,7 @@ void TempleRoom::draw(MeshRenderer& renderer, bool isWireframe) {
     drawWallWithArchway(renderer, isWireframe);
     glPopMatrix();
 
-    // 4. Stepped Dais & Altar (Multi-tiered ceremonial pedestal at room center)
+    // Stepped Dais & Altar (Multi-tiered ceremonial pedestal at room center)
     bindMaterialTexture(textures.dais, 0.85f, 0.82f, 0.78f, isWireframe);
     glPushMatrix();
     // Lower tier
@@ -378,7 +364,7 @@ void TempleRoom::draw(MeshRenderer& renderer, bool isWireframe) {
     renderMesh(renderer, altarPedestalMesh, isWireframe);
     glPopMatrix();
 
-    // 5. Four Classical Supporting Columns
+    // Four Classical Supporting Columns
     drawSingleColumn(renderer, -COL_DIST, -COL_DIST, isWireframe); // Northwest
     drawSingleColumn(renderer,  COL_DIST, -COL_DIST, isWireframe); // Northeast
     drawSingleColumn(renderer, -COL_DIST,  COL_DIST, isWireframe); // Southwest

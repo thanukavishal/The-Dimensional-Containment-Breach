@@ -1,9 +1,3 @@
-// ==============================================================================================
-// File: Props.cpp
-// Description: Implementation of atmospheric temple props (torches, rubble, pedestal, skeleton)
-//              and an animated CPU particle system simulating real-time burning torch fire.
-// ==============================================================================================
-
 #include "pch.h"
 #include "Props.h"
 #include <glut.h>
@@ -62,24 +56,24 @@ void Props::respawnParticle(FireParticle& p, int sconceIndex, bool randomLife) {
 // Purpose: Procedurally builds all 3D meshes for props and initializes all fire particles.
 // ==============================================================================================
 void Props::init() {
-    // 1. Torch Sconce Meshes (for 8 wall sconces)
+    // Torch Sconce Meshes (for 8 wall sconces)
     sconceBracketMesh = Mesh::createTexturedBox(0.25f, 0.48f, 0.06f, 1.0f, 1.0f); // Wall mount plate
     sconceArmMesh = Mesh::createCylinder(0.04f, 0.42f, 12);                         // Angled supporting rod
     sconceCupMesh = Mesh::createCylinder(0.14f, 0.18f, 16);                         // Fuel brazier bowl
 
-    // 2. Fallen Column & Stone Rubble Field Meshes (UV-mapped with stone textures)
+    // Fallen Column & Stone Rubble Field Meshes (UV-mapped with stone textures)
     fallenColSegmentMesh = Mesh::createCylinder(0.52f, 2.4f, 24);                   // Broken column shaft
     fallenCapitalMesh = Mesh::createTexturedBox(1.3f, 0.4f, 1.3f, 1.5f, 1.5f);     // Shattered capital block
     rubbleLargeMesh = Mesh::createTexturedBox(0.55f, 0.35f, 0.45f, 1.0f, 1.0f);     // Large stone fragment
     rubbleSmallMesh = Mesh::createTexturedBox(0.30f, 0.20f, 0.25f, 1.0f, 1.0f);     // Small stone fragment
 
-    // 3. Ancient Rune Pedestal Meshes (UV-mapped)
+    // Ancient Rune Pedestal Meshes (UV-mapped)
     pedestalBaseMesh = Mesh::createTexturedBox(1.25f, 0.35f, 1.25f, 1.5f, 1.5f);   // Stepped base
     pedestalPillarMesh = Mesh::createTexturedBox(0.85f, 1.30f, 0.85f, 1.0f, 2.0f); // Vertical column
     pedestalCapMesh = Mesh::createTexturedBox(1.10f, 0.20f, 1.10f, 1.2f, 1.2f);     // Top slab
-    glyphPlateMesh = Mesh::createTexturedBox(0.68f, 0.08f, 0.68f, 1.0f, 1.0f);     // Emissive glowing rune slab
+    glyphPlateMesh = Mesh::createTexturedBox(0.68f, 0.08f, 0.68f, 1.0f, 1.0f);     // glowing rune slab
 
-    // 4. Fallen Explorer Skeleton Remains Meshes
+    // Skeleton Remains Meshes
     skullCraniumMesh = Mesh::createTexturedBox(0.24f, 0.28f, 0.26f, 1.0f, 1.0f);   // Cranium
     eyeSocketMesh = Mesh::createTexturedBox(0.06f, 0.06f, 0.05f, 1.0f, 1.0f);      // Eye socket hollow
     spineMesh = Mesh::createCylinder(0.05f, 0.70f, 10);                             // Vertebral column
@@ -261,7 +255,7 @@ void Props::setEmissiveGlyphMaterial(float pulse) {
     GLfloat diffuse[] = { 0.10f, 0.70f, 0.90f, 1.0f };
     GLfloat specular[] = { 0.80f, 0.95f, 1.0f, 1.0f };
     // The pulse parameter modulates the emission color, creating a breathing/throbbing light effect
-    GLfloat emission[] = { 0.15f * pulse, 0.85f * pulse, 1.0f * pulse, 1.0f };
+    GLfloat emission[] = { 0.15f * pulse, 0.85f * pulse, 1.0f * pulse, 1.0f }; //cyan
     glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
     glMaterialfv(GL_FRONT, GL_SPECULAR, specular);

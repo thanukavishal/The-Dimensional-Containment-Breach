@@ -1,9 +1,3 @@
-// ==============================================================================================
-// File: Relic.cpp
-// Description: Implementation of the ancient floating multi-ring relic, its dynamic rotation,
-//              sinusoidal floating physics, bronze materials, and glowing energy core.
-// ==============================================================================================
-
 #include "pch.h"
 #include "Relic.h"
 #include <glut.h>
@@ -27,18 +21,19 @@ Relic::Relic()
 {
 }
 
-// ==============================================================================================
-// Method: Relic::init
-// Purpose: Constructs the procedural torus (donut) meshes for the 3 nested rings.
-// Parameters to Mesh::createTorus(tubeRadius, ringRadius, segmentsAroundRing, segmentsAroundTube):
-//   - Outer Ring: tube radius = 0.07m, main ring radius = 1.50m (largest, outermost ring).
-//   - Middle Ring: tube radius = 0.06m, main ring radius = 1.10m (fits neatly inside outer ring).
-//   - Inner Ring: tube radius = 0.05m, main ring radius = 0.72m (innermost ring surrounding core).
-// ==============================================================================================
 void Relic::init() {
     outerTorusMesh = Mesh::createTorus(0.07f, 1.50f, 40, 16);
     midTorusMesh = Mesh::createTorus(0.06f, 1.10f, 32, 16);
     innerTorusMesh = Mesh::createTorus(0.05f, 0.72f, 28, 16);
+
+    // 3D Carved Stone Idol Core Meshes
+    idolHeadMesh = Mesh::createTexturedBox(0.68f, 0.88f, 0.55f, 1.0f, 1.0f);
+    idolCrownMesh = Mesh::createTexturedBox(0.58f, 0.14f, 0.48f, 1.0f, 1.0f);
+    idolBrowMesh = Mesh::createTexturedBox(0.62f, 0.12f, 0.10f, 1.0f, 1.0f);
+    idolNoseMesh = Mesh::createTexturedBox(0.14f, 0.24f, 0.12f, 1.0f, 1.0f);
+    idolEyeSocketMesh = Mesh::createTorus(0.025f, 0.09f, 16, 12);
+    idolMouthFrameMesh = Mesh::createTexturedBox(0.42f, 0.16f, 0.08f, 1.0f, 1.0f);
+    idolToothMesh = Mesh::createTexturedBox(0.06f, 0.06f, 0.05f, 1.0f, 1.0f);
 }
 
 // ==============================================================================================
@@ -117,58 +112,129 @@ void Relic::resetEmission() {
 }
 
 // ==============================================================================================
-// Method: Relic::draw
-// Purpose: Renders the entire animated relic system with nested rotating rings and core.
+// Method: Relic::drawStoneIdolHead
+// Purpose: Renders the carved 3D stone monolith face
 // ==============================================================================================
-void Relic::draw(MeshRenderer& renderer, bool isWireframe) {
-    // Calculate vertical bobbing motion using trigonometry:
-    // sin(floatTimer) produces smooth oscillation between -1.0 and +1.0.
-    // Multiplying by 0.20f means the relic bobs up and down by +/- 20 centimeters.
+void Relic::drawStoneIdolHead(MeshRenderer& renderer, bool isWireframe, GLuint stoneTex) {
+    if (!isWireframe && stoneTex != 0) {
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, stoneTex);
+        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    }
+    else {
+        glDisable(GL_TEXTURE_2D);
+    }
+
+    // Stone material properties
+    GLfloat matAmb[] = { 0.30f, 0.28f, 0.25f, 1.0f };
+    GLfloat matDif[] = { 0.75f, 0.72f, 0.68f, 1.0f };
+    GLfloat matSpc[] = { 0.15f, 0.15f, 0.15f, 1.0f };
+    glMaterialfv(GL_FRONT, GL_AMBIENT, matAmb);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, matDif);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, matSpc);
+    glMaterialf(GL_FRONT, GL_SHININESS, 12.0f);
+
+    // Main Cranium Head Block
+    renderMesh(renderer, idolHeadMesh, isWireframe);
+
+    // Stepped Crown
+    glPushMatrix();
+    glTranslatef(0.0f, 0.50f, 0.0f);
+    renderMesh(renderer, idolCrownMesh, isWireframe);
+    glPopMatrix();
+
+    // Heavy Protruding Brow
+    glPushMatrix();
+    glTranslatef(0.0f, 0.20f, 0.28f);
+    renderMesh(renderer, idolBrowMesh, isWireframe);
+    glPopMatrix();
+
+    // Central Nose Wedge
+    glPushMatrix();
+    glTranslatef(0.0f, 0.02f, 0.30f);
+    renderMesh(renderer, idolNoseMesh, isWireframe);
+    glPopMatrix();
+
+    // Raised Parametric Torus Eye Frames with Glowing Pupils
+    for (int side = -1; side <= 1; side += 2) {
+        glPushMatrix();
+        glTranslatef(side * 0.18f, 0.12f, 0.28f);
+        renderMesh(renderer, idolEyeSocketMesh, isWireframe);
+
+        // Glowing energy pupils nested inside sockets
+        setCoreEnergyMaterial();
+        glPushMatrix();
+        GLUquadric* q = gluNewQuadric();
+        gluSphere(q, 0.045, 12, 12);
+        gluDeleteQuadric(q);
+        glPopMatrix();
+        resetEmission();
+
+        glPopMatrix();
+    }
+
+    // Carved Mouth Frame & Teeth
+    if (!isWireframe && stoneTex != 0) glEnable(GL_TEXTURE_2D);
+    glPushMatrix();
+    glTranslatef(0.0f, -0.22f, 0.28f);
+    renderMesh(renderer, idolMouthFrameMesh, isWireframe);
+
+    // --- Carved Teeth Material Customization ---
+    glDisable(GL_TEXTURE_2D); // Disable stone texture to show pure tooth color
+
+    GLfloat toothAmbient[] = { 0.35f, 0.25f, 0.05f, 1.0f }; // Shadow tint
+    GLfloat toothDiffuse[] = { 0.95f, 0.75f, 0.15f, 1.0f }; // Main surface color
+    GLfloat toothSpecular[] = { 0.90f, 0.80f, 0.40f, 1.0f }; // Shiny highlight
+    GLfloat toothShininess = 64.0f;
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT, toothAmbient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, toothDiffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, toothSpecular);
+    glMaterialf(GL_FRONT, GL_SHININESS, toothShininess);
+
+    // Row of carved stone teeth
+    for (int t = -1; t <= 1; ++t) {
+        glPushMatrix();
+        glTranslatef(t * 0.09f, 0.01f, 0.04f);
+        renderMesh(renderer, idolToothMesh, isWireframe);
+        glPopMatrix();
+    }
+    glPopMatrix();
+}
+
+// ==============================================================================================
+// Method: Relic::draw
+// Purpose: Draw complete relic with its components and rings
+// ==============================================================================================
+void Relic::draw(MeshRenderer& renderer, bool isWireframe, GLuint stoneTex) {
     float floatingY = relicBaseY + sinf(floatTimer) * 0.20f;
 
-    // Save current world matrix
     glPushMatrix();
-
-    // Move the entire relic assembly up to its floating altitude
     glTranslatef(0.0f, floatingY, 0.0f);
 
-    // Apply reflective bronze metal material for all 3 rings
     setBronzeRelicMaterial();
 
-    // --- 1. Outer Torus Ring ---
+    // Outer Torus Ring 
     glPushMatrix();
-    // Rotate outer ring around the local X axis (pitch / front-back flip)
     glRotatef(rotRing1, 1.0f, 0.0f, 0.0f);
     renderMesh(renderer, outerTorusMesh, isWireframe);
-    glPopMatrix(); // Restore matrix to unrotated floating center
+    glPopMatrix();
 
-    // --- 2. Middle Torus Ring ---
-    glPushMatrix();
-    // Rotate middle ring around the local Y axis (yaw / horizontal spin)
-    glRotatef(rotRing2, 0.0f, 1.0f, 0.0f);
-    renderMesh(renderer, midTorusMesh, isWireframe);
-    glPopMatrix(); // Restore matrix to unrotated floating center
+    // Middle Torus Ring 
+    //glPushMatrix();
+    //glRotatef(rotRing2, 0.0f, 1.0f, 0.0f);
+    //renderMesh(renderer, midTorusMesh, isWireframe);
+    //glPopMatrix();
 
-    // --- 3. Inner Torus Ring ---
+    // Inner Torus Ring 
     glPushMatrix();
-    // Rotate inner ring around a diagonal 45-degree axis (X + Z vector: 0.707, 0, 0.707)
     glRotatef(rotRing3, 0.707f, 0.0f, 0.707f);
     renderMesh(renderer, innerTorusMesh, isWireframe);
-    glPopMatrix(); // Restore matrix to unrotated floating center
-
-    // --- 4. Central Glowing Energy Core ---
-    setCoreEnergyMaterial(); // Switch material to glowing cyan emission
-    glPushMatrix();
-    // Use GLU (OpenGL Utility Library) Quadrics to render a mathematically smooth 3D sphere
-    GLUquadric* quad = gluNewQuadric();
-    gluQuadricNormals(quad, GLU_SMOOTH); // Request smooth vertex normals across sphere
-    gluSphere(quad, 0.38, 32, 32);       // Radius = 0.38m, 32 longitudinal slices, 32 latitudinal stacks
-    gluDeleteQuadric(quad);              // Free GLU quadric memory
     glPopMatrix();
 
-    // Clean up emission state so subsequent objects do not glow
-    resetEmission();
+    // Central 3D Stone Idol 
+    drawStoneIdolHead(renderer, isWireframe, stoneTex);
 
-    // Restore coordinate system back to the world origin
     glPopMatrix();
+
 }

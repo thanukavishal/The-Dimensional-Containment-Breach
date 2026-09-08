@@ -1,8 +1,3 @@
-// ==============================================================================================
-// File: MeshRenderer.cpp
-// Description: Implementation of the OpenGL rendering pipeline for Mesh objects.
-// ==============================================================================================
-
 #include "pch.h"
 #include "MeshRenderer.h"
 #include <glut.h>

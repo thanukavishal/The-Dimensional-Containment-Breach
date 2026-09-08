@@ -1,9 +1,4 @@
 #pragma once
-// ==============================================================================================
-// File: MeshRenderer.h
-// Description: Defines the MeshRenderer class responsible for drawing 3D Mesh objects with OpenGL.
-// ==============================================================================================
-
 #include "Mesh.h"
 
 class MeshRenderer {

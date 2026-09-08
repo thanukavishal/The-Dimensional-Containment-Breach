@@ -12,23 +12,12 @@
 #include "Props.h"
 #include "Camera.h"
 
-// ==============================================================================================
-// Core Subsystem Instances (Global Singletons)
-//     - templeRoom: The building (walls, floor, ceiling, pillars, archways, and colliders).
-//     - relic:      The floating multi-ring artifact in the center of the room.
-//     - props:      The torches, fire particles, rubble field, pedestal, and skeleton.
-//     - camera:     The first-person drone through which the player sees the 3D world.
-//                   Starts at (X=0.0m, Y=2.0m, Z=10.5m) facing North (Yaw=180 degrees).
-// ==============================================================================================
 MeshRenderer renderer;
 TempleRoom templeRoom;
 Relic relic;
 Props props;
 Camera camera(0.0f, 2.0f, 10.5f, 0.0f);
 
-// ==============================================================================================
-// Interactive Toggles (User Controls)
-// ==============================================================================================
 bool isWireframe = false; // Toggled by [SPACEBAR]: switches between solid filled and wireframe rendering
 bool isTorchOn = true;    // Toggled by [L]: switches dynamic ceiling torchlight on and off
 
@@ -66,16 +55,14 @@ void loadAllTextures() {
     tex.pillar = loadTexture("pillar.jpg");   // Fluted classical marble pillar texture
     tex.dais = loadTexture("dais.jpg");       // Ornate altar dais stone
     tex.door = loadTexture("door.jpg");       // Heavy security portcullis slab
+    tex.relic = loadTexture("relic.jpg");     // Center relic
     templeRoom.setTextures(tex);
     props.setTextures(tex);
 }
 
 // ==============================================================================================
 // Function: updateTorchLight
-//   frequencies (6.0 and 13.0 radians):
 //     flicker = 0.88 + 0.08 * sin(6.0 * t) + 0.04 * cos(13.0 * t)
-//   Because 6 and 13 are prime to each other, the waves interfere chaotically, creating an
-//   organic, non-repeating flame flicker
 // ==============================================================================================
 void updateTorchLight() {
     // If the user toggled torch light off with [L], disable the light source entirely
@@ -138,7 +125,7 @@ void init() {
 // ==============================================================================================
 void drawTempleEnvironment() {
     templeRoom.draw(renderer, isWireframe);
-    relic.draw(renderer, isWireframe);
+    relic.draw(renderer, isWireframe, templeRoom.getTextures().relic);
     props.drawAll(renderer, isWireframe, relic.getFloatTimer());
 }
 
@@ -270,7 +257,6 @@ int main(int argc, char** argv) {
     glutSpecialFunc(specialKeys);   // Called when a special key (arrow keys) is pressed
     glutTimerFunc(0, update, 0);    // Start the recurring 60 FPS animation timer loop
 
-    // Enter the infinite GLUT event processing loop (never returns until window closed or exit(0))
     glutMainLoop();
     return 0;
 }

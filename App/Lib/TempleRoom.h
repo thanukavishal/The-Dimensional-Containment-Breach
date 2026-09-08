@@ -1,10 +1,4 @@
 #pragma once
-// ==============================================================================================
-// File: TempleRoom.h
-// Description: Defines the architectural layout, collision boundaries, and rendering
-//              logic for the ancient temple sanctuary chamber.
-// ==============================================================================================
-
 #include "Mesh.h"
 #include "MeshRenderer.h"
 #include <vector>
@@ -29,6 +23,7 @@ struct TempleTextures {
     GLuint pillar = 0;  // Texture ID for fluted classical stone columns
     GLuint dais = 0;    // Texture ID for ornate stepped altar dais
     GLuint door = 0;    // Texture ID for iron/stone portcullis trapdoor slab
+    GLuint relic = 0;   // Texrure ID for center relic
 };
 
 // ==============================================================================================
@@ -37,15 +32,15 @@ struct TempleTextures {
 // ==============================================================================================
 class TempleRoom {
 public:
-    // Constructor: Sets initial positions (such as the concealed ceiling portcullis height).
     TempleRoom();
 
-    // Builds all procedural 3D meshes for walls, floor, ceiling, arches, and columns,
-    // and initializes the collision boundary map.
     void init();
 
     // Assigns loaded OpenGL texture IDs to the room materials.
     void setTextures(const TempleTextures& textures);
+
+    // Returns the loaded OpenGL texture IDs for the room materials.
+    const TempleTextures& getTextures() const { return textures; }
 
     // Draws all structural meshes (floor, walls, ceiling, beams, dais, columns).
     void draw(MeshRenderer& renderer, bool isWireframe);
